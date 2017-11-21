@@ -1,16 +1,16 @@
 #!/bin/sh
 
 dbsettings=`php -f /home/bitrix/backup/scripts/get_mysql_settings.php`
-// далее 
+// далее выдёргиваются из get_mysql_settings.php параметры для подключения к БД и ???
 iCnt=0;
 for settings in $dbsettings
 do
 	arSettings[$iCnt]=$settings;
-	let "iCnt++";
+	let "iCnt++"; //не совсем ясно зачем цикл? типа если одно из условий не выполняется, то выход? просто полдедовательно условия нельзя проверять?
 done
 
 i=0;
-if [ "${arSettings[$i]}" != "mysql" ]; then
+if [ "${arSettings[$i]}" != "mysql" ]; then //если база не mysql, то выходим
 	exit;
 fi
 
