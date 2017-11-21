@@ -1,7 +1,7 @@
 #!/bin/sh
 
 dbsettings=`php -f /home/bitrix/backup/scripts/get_mysql_settings.php`
-
+// далее 
 iCnt=0;
 for settings in $dbsettings
 do
