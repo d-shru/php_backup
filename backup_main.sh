@@ -6,23 +6,23 @@ iCnt=0;
 for settings in $dbsettings
 do
 	arSettings[$iCnt]=$settings;
-	let "iCnt++"; //не совсем ясно зачем цикл? типа если одно из условий не выполняется, то выход? просто полдедовательно условия нельзя проверять?
+	let "iCnt++"; #не совсем ясно зачем цикл? типа если одно из условий не выполняется, то выход? просто полдедовательно условия нельзя проверять?
 done
 
 i=0;
-if [ "${arSettings[$i]}" != "mysql" ]; then //если база не mysql, то выходим
+if [ "${arSettings[$i]}" != "mysql" ]; then #если база не mysql, то выходим
 	exit;
 fi
 
 i=1;
 mysqlHost=""
 if [ "${arSettings[$i]}" != "localhost" ]; then
-	mysqlHost="-h ${arSettings[$i]} ";
+	mysqlHost="-h ${arSettings[$i]} "; #не догнал... 
 fi
 
 i=2;
 mysqlUser="${arSettings[$i]}";
-if [ "$mysqlUser" = "" ]; then
+if [ "$mysqlUser" = "" ]; then #почему кавычки пустые?
 	exit;
 fi
 
@@ -61,12 +61,12 @@ function randString ()
 randFName=`randString`
 
 extSite=
-test -f /home/bitrix/backup/scripts/extsite.txt && { extSite=`cat /home/bitrix/backup/scripts/extsite.txt` ; } ;
+test -f /home/bitrix/backup/scripts/extsite.txt && { extSite=`cat /home/bitrix/backup/scripts/extsite.txt` ; } ; #файла extsite.txt нет на месте, что в нём должно было быть?
 test -z "$extSite" && { backupFolder="." ; } || { backupFolder=". $extSite" ; } ;
 
 test ! -d /home/bitrix/www/bitrix/backup && {
 	mkdir -p /home/bitrix/www/bitrix/backup ;
-	echo "<head><meta http-equiv=\"REFRESH\" content=\"0;URL=/bitrix/admin/index.php\"></head>" > /home/bitrix/www/bitrix/backup/index.php ;
+	echo "<head><meta http-equiv=\"REFRESH\" content=\"0;URL=/bitrix/admin/index.php\"></head>" > /home/bitrix/www/bitrix/backup/index.php ; //это зачем?
 	chown -R bitrix:bitrix /home/bitrix/www/bitrix/backup ;
 	chmod -R 0755 /home/bitrix/www/bitrix/backup ;
 }
