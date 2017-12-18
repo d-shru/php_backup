@@ -29,14 +29,6 @@ mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/m
 #sed -i '//d' /etc/php.ini >/dev/null 2>&1
 
 
-# Clean mysql log
-sed -i "/\/*40101 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
-sed -i "/\/*40103 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
-sed -i "/\!40111 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
-sed -i "/\!40014 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
-sed -i "/\!40000 ALTER/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
-
-
 # remove backups older 1 day
 find /mnt/backup -mtime +0 -exec rm {} \;
 
