@@ -26,8 +26,6 @@ RNDNAME=`randString`
 
 mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
 
-#sed -i '//d' /etc/php.ini >/dev/null 2>&1
-
 
 # remove backups older 1 day
 find /mnt/backup -mtime +0 -exec rm {} \;
@@ -39,4 +37,4 @@ tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www 
 
 gzip /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar
 
-rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
