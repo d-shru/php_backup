@@ -41,7 +41,7 @@ sed -i "/\!40000 ALTER/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${r
 find /mnt/backup -mtime +0 -exec rm {} \;
 
 
-tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt /home/bitrix/www -C /home/bitrix/www
+tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www
 tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
 tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www upload/main
 
