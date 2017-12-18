@@ -3,35 +3,19 @@
 DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 
 SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
-#SQLHOST=$(grep 'DBHost' $DBFILE | cut -d '"' -f2)
 SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
 
 TDATE=`/bin/date +%Y.%m.%d`
 
-function randString ()
-{
-        local randLength
-        if [ $1 ]; then
-                randLength=$1
-        else
-                randLength=8
-        fi
-        rndStr=</dev/urandom tr -dc A-Za-z0-9 | head -c $randLength
-        echo $rndStr
-}
-
-RNDNAME=`randString`
-
+RNDNAME=$(echo $$)
 
 mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
-
 
 # remove backups older 1 day
 find /mnt/backup -mtime +0 -exec rm {} \;
 
-
-tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www
+tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www .
 tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
 tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www upload/main
 
