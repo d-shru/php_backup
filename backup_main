@@ -3,7 +3,7 @@
 DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 
 SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
-SQLHOST=$(grep 'DBHost' $DBFILE | cut -d '"' -f2)
+#SQLHOST=$(grep 'DBHost' $DBFILE | cut -d '"' -f2)
 SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
 
