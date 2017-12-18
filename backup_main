@@ -1,0 +1,50 @@
+#!/bin/sh
+
+DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
+
+SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
+SQLHOST=$(grep 'DBHost' $DBFILE | cut -d '"' -f2)
+SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
+SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
+
+TDATE=`/bin/date +%Y.%m.%d`
+
+function randString ()
+{
+        local randLength
+        if [ $1 ]; then
+                randLength=$1
+        else
+                randLength=8
+        fi
+        rndStr=</dev/urandom tr -dc A-Za-z0-9 | head -c $randLength
+        echo $rndStr
+}
+
+RNDNAME=`randString`
+
+
+mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
+
+#sed -i '//d' /etc/php.ini >/dev/null 2>&1
+
+
+# Clean mysql log
+#sed -i "/\/*40101 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+#sed -i "/\/*40103 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+#sed -i "/\!40111 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+#sed -i "/\!40014 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+#sed -i "/\!40000 ALTER/d" /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
+
+
+# remove backups older 1 day
+find /mnt/backup -mtime +0 -exec rm {} \;
+
+
+tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt /home/bitrix/www -C /home/bitrix/www
+tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
+tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www upload/main
+
+gzip /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar
+
+rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${tdate}_${randFName}.sql
