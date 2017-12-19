@@ -31,7 +31,7 @@ if [ "$SETLOC" == "true" ]; then
         echo "SET NAMES 'cp1251' COLLATE 'cp1251_general_ci';" > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_after_connect.sql
     fi
 
-# remove backups older 1 day
+# remove backups older than 1 day
 find /mnt/backup -mtime +0 -exec rm {} \;
 
 tar -cf /mnt/backup/www_backup_${TDATE}_main.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www .
