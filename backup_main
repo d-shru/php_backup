@@ -7,7 +7,7 @@ SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
 SETLOC=$(grep 'BX_UTF' $DBFILE | cut -d ' ' -f2 | cut -d ')' -f1)
 
-TDATE=`/bin/date +%Y.%m.%d_%H.%M.%S`
+TDATE=`date +%Y.%m.%d_%H.%M.%S`
 
 test ! -d /home/bitrix/www/bitrix/backup && {
     mkdir -p /home/bitrix/www/bitrix/backup ;
@@ -17,7 +17,6 @@ test ! -d /home/bitrix/www/bitrix/backup && {
 
 mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
 
-#sed -i '//d' /etc/php.ini >/dev/null 2>&1
 
 # Clean mysql log
 sed -i "/\/*40101 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
