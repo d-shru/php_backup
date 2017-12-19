@@ -5,20 +5,42 @@ DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
 SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
+SETLOC=$(grep 'BX_UTF' $DBFILE | cut -d ' ' -f2 | cut -d ')' -f1)
 
-TDATE=`/bin/date +%Y.%m.%d`
+TDATE=`/bin/date +%Y.%m.%d_%H.%M.%S`
 
-RNDNAME=$(echo $$)
+test ! -d /home/bitrix/www/bitrix/backup && {
+    mkdir -p /home/bitrix/www/bitrix/backup ;
+    chown -R bitrix:bitrix /home/bitrix/www/bitrix/backup ;
+    chmod -R 0755 /home/bitrix/www/bitrix/backup ;
+}
 
-mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
+mysqldump -u ${SQLUSER} -p${SQLPASS} ${SQLDB} > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+
+#sed -i '//d' /etc/php.ini >/dev/null 2>&1
+
+# Clean mysql log
+sed -i "/\/*40101 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+sed -i "/\/*40103 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+sed -i "/\!40111 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+sed -i "/\!40014 SET/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+sed -i "/\!40000 ALTER/d" /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+
+if [ "$SETLOC" == "true" ]; then
+        echo "SET NAMES 'utf8' COLLATE 'utf8_unicode_ci';" > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_after_connect.sql
+    else
+        echo "SET NAMES 'cp1251' COLLATE 'cp1251_general_ci';" > /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_after_connect.sql
+    fi
 
 # remove backups older 1 day
 find /mnt/backup -mtime +0 -exec rm {} \;
 
-tar -cf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www .
-tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
-tar -rf /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar -C /home/bitrix/www upload/main
+tar -cf /mnt/backup/www_backup_${TDATE}_main.tar --exclude-from /home/bitrix/scripts/ex_main.txt -C /home/bitrix/www .
+tar -rf /mnt/backup/www_backup_${TDATE}_main.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}.sql
+tar -rf /mnt/backup/www_backup_${TDATE}_main.tar -C /home/bitrix/www bitrix/backup/mysql_dump_${TDATE}_after_connect.sql
+tar -rf /mnt/backup/www_backup_${TDATE}_main.tar -C /home/bitrix/www upload/main
 
-gzip /mnt/backup/www_backup_${TDATE}_main_${RNDNAME}.tar
+gzip /mnt/backup/www_backup_${TDATE}_main.tar
 
-rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_${RNDNAME}.sql
+rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}.sql
+rm -f /home/bitrix/www/bitrix/backup/mysql_dump_${TDATE}_after_connect.sql
