@@ -27,7 +27,7 @@ sed -i '/php70_conf$/s/\/enabled=0\/enabled=1\//\/enabled=1\/enabled=0\//' $BFIL
 
 echo "bitrix-env.sh was changed"
 
-# попытка сделать однократный запуск скрипта после перезагрузки (после удаления sellinux)
+# попытка сделать однократный запуск скрипта после перезагрузки (после удаления selinux)
 #echo "/root/bitrix-env.sh" >> /root/.bash_profile
 
 #запускаем установщик
