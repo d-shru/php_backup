@@ -6,7 +6,7 @@ TPKG=$(rpm -qa | grep wget)
 if [ -n "$TPKG" ]; then 
         echo "wget already installed"
     else
-        yum install wget
+        yum install wget mc net-tools
     fi
     
 # качаем установщик bitrix окружения
@@ -27,22 +27,16 @@ sed -i '/php70_conf$/s/\/enabled=0\/enabled=1\//\/enabled=1\/enabled=0\//' $BFIL
 
 echo "bitrix-env.sh was changed"
 
-# попытка сделать однократный запуск скрипта после перезагрузки (после удаления selinux)
-#echo "/root/bitrix-env.sh" >> /root/.bash_profile
-
-#запускаем установщик
+# запускаем установщик
 ./bitrix-env.sh
-
-# очистка
-#sed -i '/\/root\/bitrix-env\.sh/d' /root/.bash_profile
 
 # вытаскиваем данные для подключения к БД из dbconn.php
 DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 SETFILE='/home/bitrix/www/bitrix/.settings.php'
 
-SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
-SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
-SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
+SQLOLDUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
+SQLOLDDBNAME=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
+SQLOLDPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
 
 # монтируем диск с бекапами
 mount /dev/sdb1 /mnt
@@ -54,29 +48,29 @@ NEWFILE=$(ls -t | grep main | head -1)
 # распаковываем веб-окружение
 tar -xvzf $NEWFILE -C /home/bitrix/www
 
-# повторно вытаскиваем данные для подключения к БД из dbconn.php для последующей замены
+# повторно вытаскиваем данные для подключения к БД из dbconn.php для замены
 NEWDBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 NEWSETFILE='/home/bitrix/www/bitrix/.settings.php'
 
-NEWSQLUSER=$(grep 'DBLogin' $NEWDBFILE | cut -d '"' -f2)
-NEWSQLDB=$(grep 'DBName' $NEWDBFILE | cut -d '"' -f2)
-NEWSQLPASS=$(grep 'DBPassword' $NEWDBFILE | cut -d '"' -f2)
+SQLNEWUSER=$(grep 'DBLogin' $NEWDBFILE | cut -d '"' -f2)
+SQLNEWDB=$(grep 'DBName' $NEWDBFILE | cut -d '"' -f2)
+SQLNEWPASS=$(grep 'DBPassword' $NEWDBFILE | cut -d '"' -f2)
 
 # замена в /home/bitrix/www/bitrix/.settings.php на данные из бекапа
 sed -i '/className/s/MysqlConnection/MysqliConnection/' $NEWSETFILE
-sed -i '/database/s/'"$NEWSQLDB"'/'"$SQLDB"'/' $NEWSETFILE
-sed -i "/login/s/$NEWSQLUSER/$SQLUSER/" $NEWSETFILE
-sed -i '/password/s/'"$NEWSQLPASS"'/'"$SQLPASS"'/' $NEWSETFILE
+sed -i '/database/s/'"$SQLNEWDB"'/'"$SQLOLDDBNAME"'/' $NEWSETFILE
+sed -i "/login/s/$SQLNEWUSER/$SQLOLDUSER/" $NEWSETFILE
+sed -i '/password/s/'"$SQLNEWPASS"'/'"$SQLOLDPASS"'/' $NEWSETFILE
 
 sed -i '/?>/i define(\"BX_USE_MYSQLI\", true);' $NEWDBFILE
 
-#замена в /home/bitrix/www/bitrix/php_interface/dbconn.php на данные из бекапа
-sed -i "/DBName/s/$NEWSQLDB/$SQLDB/" $NEWDBFILE
-sed -i "/DBLogin/s/$NEWSQLUSER/$SQLUSER/" $NEWDBFILE
-sed -i '/DBPassword /s/'"$NEWSQLPASS"'/'"$SQLPASS"'/' $NEWDBFILE
+# замена в /home/bitrix/www/bitrix/php_interface/dbconn.php на данные из бекапа
+sed -i "/DBName/s/$SQLNEWDB/$SQLOLDDBNAME/" $NEWDBFILE
+sed -i "/DBLogin/s/$SQLNEWUSER/$SQLOLDUSER/" $NEWDBFILE
+sed -i '/DBPassword /s/'"$SQLNEWPASS"'/'"$SQLOLDPASS"'/' $NEWDBFILE
 
 cd /home/bitrix/www/bitrix/backup/
 
 # выбираеем самый новый дамп базы и делаем импорт
 SQLFILE=$(ls -t | grep dump | head -1)
-mysql -u $SQLUSER -p$SQLPASS $SQLDB < /home/bitrix/www/bitrix/backup/$SQLFILE
+mysql -u $SQLOLDUSER -p$SQLOLDPASS $SQLOLDDBNAME < /home/bitrix/www/bitrix/backup/$SQLFILE
