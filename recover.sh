@@ -64,9 +64,9 @@ NEWSQLPASS=$(grep 'DBPassword' $NEWDBFILE | cut -d '"' -f2)
 
 # замена в /home/bitrix/www/bitrix/.settings.php на данные из бекапа
 sed -i '/className/s/MysqlConnection/MysqliConnection/' $NEWSETFILE
-sed -i '/database/s/'"$SQLDB1"'/'"$SQLDB"'/' $NEWSETFILE
+sed -i '/database/s/'"$NEWSQLDB"'/'"$SQLDB"'/' $NEWSETFILE
 sed -i "/login/s/$NEWSQLUSER/$SQLUSER/" $NEWSETFILE
-sed -i '/password/s/'"$SQLPASS1"'/'"$SQLPASS"'/' $NEWSETFILE
+sed -i '/password/s/'"$NEWSQLPASS"'/'"$SQLPASS"'/' $NEWSETFILE
 
 sed -i '/?>/i define(\"BX_USE_MYSQLI\", true);' $NEWDBFILE
 
