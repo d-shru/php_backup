@@ -6,7 +6,7 @@ TPKG=$(rpm -qa | grep wget)
 if [ -n "$TPKG" ]; then 
         echo "wget already installed"
     else
-        yum install wget mc net-tools
+        yum install wget
     fi
     
 # качаем установщик bitrix окружения
@@ -43,7 +43,6 @@ SETFILE='/home/bitrix/www/bitrix/.settings.php'
 SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
 SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
-#SETLOC=$(grep 'BX_UTF' $DBFILE | cut -d ' ' -f2 | cut -d ')' -f1)
 
 # монтируем диск с бекапами
 mount /dev/sdb1 /mnt
