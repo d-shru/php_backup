@@ -52,22 +52,22 @@ tar -xvzf $NEWFILE -C /home/bitrix/www
 DBFILE='/home/bitrix/www/bitrix/php_interface/dbconn.php'
 SETFILE='/home/bitrix/www/bitrix/.settings.php'
 
-SQLNEWUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
-SQLNEWDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
+SQLUSER=$(grep 'DBLogin' $DBFILE | cut -d '"' -f2)
+SQLDB=$(grep 'DBName' $DBFILE | cut -d '"' -f2)
 SQLNEWPASS=$(grep 'DBPassword' $DBFILE | cut -d '"' -f2)
 
 # замена в /home/bitrix/www/bitrix/.settings.php на данные из бекапа
 sed -i '/className/s/MysqlConnection/MysqliConnection/' $SETFILE
-sed -i '/database/s/'"$SQLNEWDB"'/'"$SQLOLDDBNAME"'/' $SETFILE
-sed -i "/login/s/$SQLNEWUSER/$SQLOLDUSER/" $SETFILE
-sed -i '/password/s/'"$SQLNEWPASS"'/'"$SQLOLDPASS"'/' $SETFILE
+sed -i '/database/s/'"$SQLDB"'/'"$SQLOLDDBNAME"'/' $SETFILE
+sed -i "/login/s/$SQLUSER/$SQLOLDUSER/" $SETFILE
+sed -i '/password/s/'"$SQLPASS"'/'"$SQLOLDPASS"'/' $SETFILE
 
 sed -i '/?>/i define(\"BX_USE_MYSQLI\", true);' $DBFILE
 
 # замена в /home/bitrix/www/bitrix/php_interface/dbconn.php на данные из бекапа
-sed -i "/DBName/s/$SQLNEWDB/$SQLOLDDBNAME/" $DBFILE
-sed -i "/DBLogin/s/$SQLNEWUSER/$SQLOLDUSER/" $DBFILE
-sed -i '/DBPassword /s/'"$SQLNEWPASS"'/'"$SQLOLDPASS"'/' $DBFILE
+sed -i "/DBName/s/$SQLDB/$SQLOLDDBNAME/" $DBFILE
+sed -i "/DBLogin/s/$SQLUSER/$SQLOLDUSER/" $DBFILE
+sed -i '/DBPassword /s/'"$SQLPASS"'/'"$SQLOLDPASS"'/' $DBFILE
 
 cd /home/bitrix/www/bitrix/backup/
 
